@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wet Floor Archive</title>
+<meta name="description" content="A visual archive of wet floor signs from around the world.">
+<meta property="og:title" content="Wet Floor Archive">
+<meta property="og:description" content="A visual archive of wet floor signs from around the world.">
+<meta property="og:image" content="img/001.jpg">
+<link rel="icon" href="thumb/001.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="index">
+<div class="page">
+<header class="top">
+<div class="l"><a class="brand" href="index.html">Wet Floor Archive</a>
+<nav aria-label="Sections"><a href="index.html" class="on" aria-current="page">Index</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="sign.html">Your Sign</a></nav></div>
+<a class="ig" href="https://www.instagram.com/wetfloor.archive/" target="_blank" rel="noopener">instagram</a>
+</header>
+<main>
+<div class="stage">
+<button class="photo" id="photo" type="button" aria-label="Next sign"><img id="big" alt=""></button>
+<section class="band" aria-label="All signs">
+<div class="strip" id="strip"><div class="row" id="row"></div></div>
+<div class="info cap">
+<p id="cap"></p>
+<div class="nav"><button type="button" id="prev" aria-label="Previous sign">←</button><span id="pos"></span><button type="button" id="next" aria-label="Next sign">→</button></div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<script src="data.js"></script>
+<script>
+(function(){
+  var D = window.WFA, i = 0, row = document.getElementById('row');
+  var hover = window.matchMedia('(hover: hover)').matches;
+  D.forEach(function(d, k){
+    var t = document.createElement('div'); t.className = 't';
+    t.innerHTML = '<span aria-hidden="true">' + d.n + '</span><button type="button" aria-label="Sign ' + d.n + '"><img src="thumb/' + d.n + '.jpg" alt="" loading="lazy" decoding="async"></button><i></i>';
+    var b = t.querySelector('button');
+    if (hover) b.addEventListener('mouseenter', function(){ go(k); });
+    b.addEventListener('click', function(){ go(k); });
+    b.addEventListener('focus', function(){ go(k); });
+    row.appendChild(t);
+  });
+  var cache = {};
+  function pre(k){ var n = D[k].n; if (!cache[n]) { cache[n] = new Image(); cache[n].src = 'img/' + n + '.jpg'; } }
+  function go(k, scroll){
+    i = (k + D.length) % D.length; var d = D[i];
+    pre(i);
+    document.getElementById('big').src = 'img/' + d.n + '.jpg';
+    document.getElementById('big').alt = 'Sign ' + d.n + ', ' + d.city + ', ' + d.country;
+    document.getElementById('cap').textContent = d.n + ' / ' + d.date + ' — ' + d.city + ', ' + d.country;
+    document.getElementById('pos').textContent = d.n + '/' + D[D.length - 1].n;
+    var ts = row.children;
+    for (var j = 0; j < ts.length; j++) ts[j].classList.toggle('act', j === i);
+    if (scroll) { var el = ts[i], st = document.getElementById('strip'); st.scrollTo({ left: el.offsetLeft - st.clientWidth / 2 + el.offsetWidth / 2, behavior: 'smooth' }); }
+  }
+  document.getElementById('photo').addEventListener('click', function(){ go(i + 1, true); });
+  document.getElementById('next').addEventListener('click', function(){ go(i + 1, true); });
+  document.getElementById('prev').addEventListener('click', function(){ go(i - 1, true); });
+  var h = (location.hash || '').slice(1), start = 0;
+  D.forEach(function(d, k){ if (d.n === h) start = k; });
+  go(start, start > 0);
+  window.addEventListener('load', function(){ var k = 0; (function step(){ if (k < D.length) { pre(k++); setTimeout(step, 60); } })(); });
+})();
+</script>
+</body>
+</html>

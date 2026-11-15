@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archive — Wet Floor Archive</title>
+<meta name="description" content="A visual archive of wet floor signs from around the world.">
+<meta property="og:title" content="Archive — Wet Floor Archive">
+<meta property="og:description" content="A visual archive of wet floor signs from around the world.">
+<meta property="og:image" content="img/001.jpg">
+<link rel="icon" href="thumb/001.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="archive">
+<div class="page">
+<header class="top">
+<div class="l"><a class="brand" href="index.html">Wet Floor Archive</a>
+<nav aria-label="Sections"><a href="index.html">Index</a><a href="archive.html" class="on" aria-current="page">Archive</a><a href="about.html">About</a><a href="sign.html">Your Sign</a></nav></div>
+<a class="ig" href="https://www.instagram.com/wetfloor.archive/" target="_blank" rel="noopener">instagram</a>
+</header>
+<main><div class="grid" id="grid"></div></main>
+<footer class="foot cap"><p id="info">&nbsp;</p></footer>
+</div>
+<script src="data.js"></script>
+<script>
+(function(){
+  var g = document.getElementById('grid'), info = document.getElementById('info');
+  window.WFA.forEach(function(d){
+    var a = document.createElement('a');
+    a.href = 'index.html#' + d.n;
+    a.setAttribute('aria-label', 'Sign ' + d.n + ', ' + d.city + ', ' + d.country);
+    a.innerHTML = '<img src="thumb/' + d.n + '.jpg" alt="" loading="lazy" decoding="async">';
+    var show = function(){ info.textContent = d.n + ' / ' + d.date + ' — ' + d.city + ', ' + d.country; };
+    a.addEventListener('mouseenter', show); a.addEventListener('focus', show);
+    g.appendChild(a);
+  });
+})();
+</script>
+</body>
+</html>

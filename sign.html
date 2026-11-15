@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Sign — Wet Floor Archive</title>
+<meta name="description" content="Write your own wet floor sign and download it.">
+<meta property="og:title" content="Your Sign — Wet Floor Archive">
+<meta property="og:description" content="Write your own wet floor sign and download it.">
+<meta property="og:image" content="img/001.jpg">
+<link rel="icon" href="thumb/001.jpg">
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+</head>
+<body class="sign">
+<div class="page">
+<header class="top">
+<div class="l"><a class="brand" href="index.html">Wet Floor Archive</a>
+<nav aria-label="Sections"><a href="index.html">Index</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="sign.html" class="on" aria-current="page">Your Sign</a></nav></div>
+<a class="ig" href="https://www.instagram.com/wetfloor.archive/" target="_blank" rel="noopener">instagram</a>
+</header>
+<main>
+<div class="board">
+<img id="img" src="assets/sign-print.jpg" alt="Caution sign">
+<textarea id="t" rows="2" placeholder="WRITE HERE" aria-label="Write on the sign, up to two lines" spellcheck="false"></textarea>
+<span class="wm" style="left:4%">Wet Floor Archive</span>
+<span class="wm" style="right:4%" id="date"></span>
+</div>
+<div class="bar">
+<div class="ver" role="group" aria-label="Version"><button type="button" id="bPrint" class="on" aria-pressed="true">Print</button><button type="button" id="bYellow" aria-pressed="false">Yellow</button></div>
+<button type="button" class="dl" id="dl">Download</button>
+</div>
+</main>
+</div>
+<script>
+(function(){
+  var V = {
+    print:  { img: 'assets/sign-print.jpg',  cx: .5012, cy: .5885, fs: 2.07, w: 17, font: "'Montserrat','Arial Black',sans-serif", cfont: 'Montserrat, Arial Black, sans-serif' },
+    yellow: { img: 'assets/sign-yellow.jpg', cx: .5004, cy: .644,  fs: 3.40, w: 24, font: "'Helvetica Neue',Helvetica,Arial,sans-serif", cfont: '"Helvetica Neue", Helvetica, Arial, sans-serif' }
+  };
+  var ver = 'print', text = '', $ = function(id){ return document.getElementById(id); };
+  var ctx = document.createElement('canvas').getContext('2d');
+  function em(t, f){ ctx.font = '700 100px ' + f; return ctx.measureText(t).width / 100; }
+  function wrap(txt, maxEm, f){
+    var out = [], fit = function(t){ return em(t, f) <= maxEm; };
+    (txt || '').toUpperCase().split('\n').forEach(function(p){
+      var ws = p.split(/\s+/).filter(Boolean);
+      if (!ws.length) { out.push(''); return; }
+      var line = '';
+      ws.forEach(function(w){
+        var t = line ? line + ' ' + w : w;
+        if (fit(t)) { line = t; return; }
+        if (line) { out.push(line); line = ''; }
+        var ch = '';
+        Array.from(w).forEach(function(c){ if (fit(ch + c) || !ch) ch += c; else { out.push(ch); ch = c; } });
+        line = ch;
+      });
+      out.push(line);
+    });
+    return out;
+  }
+  function lines(t){ var c = V[ver]; return wrap(t, c.w / c.fs, c.cfont); }
+  function today(){ var d = new Date(), p = function(n){ return String(n).padStart(2, '0'); }; return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear(); }
+  function apply(){
+    var c = V[ver], ta = $('t');
+    $('img').src = c.img;
+    ta.style.left = c.cx * 100 + '%'; ta.style.top = c.cy * 100 + '%';
+    ta.style.width = c.w + 'cqw'; ta.style.height = (c.fs * 1.12 * 2 + .3) + 'cqw';
+    ta.style.fontSize = c.fs + 'cqw'; ta.style.fontFamily = c.font;
+    $('bPrint').classList.toggle('on', ver === 'print'); $('bYellow').classList.toggle('on', ver === 'yellow');
+    $('bPrint').setAttribute('aria-pressed', ver === 'print'); $('bYellow').setAttribute('aria-pressed', ver === 'yellow');
+    if (lines(text).length > 2) { text = ''; ta.value = ''; }
+  }
+  $('date').textContent = today();
+  $('t').addEventListener('input', function(e){
+    var v = e.target.value.split('\n').slice(0, 2).join('\n');
+    if (lines(v).length > 2) { e.target.value = text; return; }
+    text = v; if (e.target.value !== v) e.target.value = v;
+  });
+  $('bPrint').onclick = function(){ ver = 'print'; apply(); };
+  $('bYellow').onclick = function(){ ver = 'yellow'; apply(); };
+  var dlNs = null;
+  try { if (window.claude && window.claude.use) window.claude.use('downloads').then(function(n){ dlNs = n; }).catch(function(){}); } catch (e) {}
+  $('dl').onclick = function(){
+    var c = V[ver], L = lines(text).slice(0, 2).filter(function(l){ return l.trim(); }), date = today();
+    var img = new Image();
+    img.onload = function(){
+      var N = img.naturalWidth, cv = document.createElement('canvas'); cv.width = N; cv.height = img.naturalHeight;
+      var g = cv.getContext('2d'); g.drawImage(img, 0, 0);
+      var f = N * c.fs / 100; g.fillStyle = '#141414'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = '700 ' + f + 'px ' + c.cfont; try { g.letterSpacing = (f * .01) + 'px'; } catch (e) {}
+      var cy = cv.height * c.cy, lh = f * 1.12;
+      L.forEach(function(l, k){ g.fillText(l, N * c.cx, cy + (k - (L.length - 1) / 2) * lh); });
+      try { g.letterSpacing = '0px'; } catch (e) {}
+      g.fillStyle = '#000'; g.textBaseline = 'alphabetic'; g.font = (N * .0125) + 'px "Times New Roman", Times, serif';
+      g.textAlign = 'left'; g.fillText('Wet Floor Archive', N * .04, cv.height * .96);
+      g.textAlign = 'right'; g.fillText(date, N * .96, cv.height * .96);
+      cv.toBlob(function(b){
+        var slug = L.join(' ').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'caution';
+        var filename = 'wet-floor-archive-' + slug + '.png';
+        if (dlNs) { dlNs.save({ filename: filename, data: b }).catch(function(){}); return; }
+        var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+      }, 'image/png');
+    };
+    img.src = c.img;
+  };
+  if (document.fonts) document.fonts.load('700 100px Montserrat').catch(function(){});
+  apply();
+})();
+</script>
+</body>
+</html>

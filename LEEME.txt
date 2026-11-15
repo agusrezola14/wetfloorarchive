@@ -1,0 +1,11 @@
+WET FLOOR ARCHIVE — web
+
+Para sumar un cartel nuevo (ej. el 069):
+1. Poné la foto en la carpeta img/ con el nombre 069.jpg (vertical 4:5, ~880x1100 px).
+2. Poné una versión chica en thumb/ con el mismo nombre (240x300 px).
+3. Abrí data.js con cualquier editor de texto y agregá una línea al final de la lista:
+   {"n": "069", "date": "DD.MM.AAAA", "city": "Ciudad", "country": "País"},
+   (fijate que la línea anterior termine con una coma)
+4. Volvé a subir la carpeta al hosting.
+
+O pedíselo a Claude con la foto y los datos.
